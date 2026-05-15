@@ -25,15 +25,18 @@ const userSchema = new mongoose.Schema({
 // con el this podemos acceder a los datos del usuario que se esta guardando.
 // con esta funcion se encripta la contraseña del usuario antes de guardarla en la base de datos.
 // hash() es una funcion de la libreria bcryptjs que se utiliza para encriptar la contraseña.
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function() {
    const user = this; 
-   if(!user.isModified('password')) return next(); // si el campo password no ha sido modificado, se salta el proceso de encriptacion y se continua con la siguiente accion.
+   if(!user.isModified('password')) return; // si el campo password no ha sido modificado, se salta el proceso de encriptacion y se continua con la siguiente accion.
+
+// 👉 Aquí Mongoose espera automáticamente a que termine la función
+// 👉 NO necesitas llamar a next()
+// 👉 Cuando la función termina → continúa sola
 
     try{
     const salt = await bcryptjs.genSalt(10)   // aca en esta linea con bcryptjs se genera un salt, que es una cadena de caracteres aleatoria que se utiliza para encriptar la contraseña, y se le pasa un numero que indica el numero de rondas de encriptacion, entre mas rondas, mas seguro es el hash generado, pero tambien tarda mas tiempo en generarlo.
-    user.password = await bcryptjs.hash(user.password, salt)
-    next();
-   }catch(error){
+    user.password = await bcryptjs.hash(user.password, salt);
+    }catch(error){
     console.log(error);
     throw new Error('Error al encriptar la contraseña');
    }

@@ -1,12 +1,11 @@
-import {router} from "express";
-
+import express from "express";
 import { login, register } from "../controllers/auth.controller.js";
 import { validationResultExpress } from "../middlewares/validationResultExpress.js";
 // con este import se va a poder usar el metodo body de express-validator, que es una funcion que se utiliza para validar los datos que se reciben en el cuerpo de la peticion (req.body)....,
 // ...y se puede usar para validar que el email tenga un formato correcto, que la contraseña tenga una longitud minima, etc.
 import { body } from "express-validator";
 
-const router = Router();
+const router = express.Router();
 
 
 // aca solo se esta importando desde el auth.controller.js la funcion login y register....,
