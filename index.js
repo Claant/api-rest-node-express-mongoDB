@@ -11,7 +11,6 @@ app.use(express.json());
 app.use('/api/v1/auth', authRouter);
 
 
-
 // aca en caso que un servidor ya sea heroku o render, no usen un puerto por defecto, usarian el puerto 5000
 const PORT = process.env.PORT || 5000;
 
