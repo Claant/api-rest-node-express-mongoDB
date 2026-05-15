@@ -1,11 +1,12 @@
-import express from "express";
+import {router} from "express";
+
 import { login, register } from "../controllers/auth.controller.js";
 import { validationResultExpress } from "../middlewares/validationResultExpress.js";
 // con este import se va a poder usar el metodo body de express-validator, que es una funcion que se utiliza para validar los datos que se reciben en el cuerpo de la peticion (req.body)....,
 // ...y se puede usar para validar que el email tenga un formato correcto, que la contraseña tenga una longitud minima, etc.
 import { body } from "express-validator";
 
-const router = express.Router();
+const router = Router();
 
 
 // aca solo se esta importando desde el auth.controller.js la funcion login y register....,
@@ -26,6 +27,7 @@ router.post(
     // .isLength({ min: 6 }) esta funcion se utiliza para validar que la contraseña tenga una longitud minima de 6 caracteres.
     body("password", "Minimo 6 caracteres").trim().isLength({ min: 6 }),
 
+    // custom se usa para crear una validacion personalizada.
     // aca validamos que el campo password y repassword sean iguales, para evitar que el usuario se equivoque al escribir la contraseña y luego no pueda iniciar sesion porque no recuerda como la escribio.
     body("password", "formato de password no valido").custom(
       (value, { req }) => {

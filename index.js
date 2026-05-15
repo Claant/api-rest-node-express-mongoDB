@@ -8,7 +8,7 @@ const app = express();
 // para que el servidor pueda entender las peticiones con formato JSON, y poder acceder a los datos que se envian en el cuerpo de la peticion (req.body)
 app.use(express.json()); 
 // aca usamos la ruta de authRouter, para que todas las rutas que se definan en ese archivo, esten disponibles en el servidor.
-app.use('/api/v1', authRouter);
+app.use('/api/v1/auth', authRouter);
 
 
 
