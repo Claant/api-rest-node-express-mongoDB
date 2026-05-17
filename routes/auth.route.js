@@ -22,9 +22,8 @@ router.post(
       .trim()
       .isEmail()
       .normalizeEmail(),
-
-    // .isLength({ min: 6 }) esta funcion se utiliza para validar que la contraseña tenga una longitud minima de 6 caracteres.
-    body("password", "Minimo 6 caracteres").trim().isLength({ min: 6 }),
+   
+    body("password", "Minimo 6 caracteres").trim().isLength({ min: 6 }), // .isLength({ min: 6 }) esta funcion se utiliza para validar que la contraseña tenga una longitud minima de 6 caracteres.
 
     // custom se usa para crear una validacion personalizada.
     // aca validamos que el campo password y repassword sean iguales, para evitar que el usuario se equivoque al escribir la contraseña y luego no pueda iniciar sesion porque no recuerda como la escribio.
@@ -42,8 +41,6 @@ router.post(
   validationResultExpress,
   register,  // controlador que esta en controlles/auth.controller.js, que se va a ejecutar si no hay errores de validacion.
 );
-
-
 
 router.post("/login",
     body("email", "Formato de email no valido")

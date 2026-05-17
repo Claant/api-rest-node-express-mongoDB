@@ -46,5 +46,17 @@ userSchema.pre('save', async function() {
     // y permite crear, leer, actualizar y eliminar documentos en esa coleccion.  
     // Model se usa para crear un modelo a partir del esquema definido, el primer argumento es el nombre del modelo (en singular)...,
     // y el segundo argumento es el esquema que se va a usar para ese modelo.
+    
+
+
+// esta funcion se utiliza para comparar la contraseña que se recibe en el cuerpo de la peticion (req.body) con la contraseña encriptada que se encuentra en la base de datos, y devuelve true si las contraseñas coinciden, o false si no coinciden.
+  userSchema.methods.comparePassword = async function(candidatePassword) {
+    return await bcryptjs.compare(candidatePassword, this.password); // esta funcion se utiliza para comparar la contraseña que se recibe en el cuerpo de la peticion (req.body) con la contraseña encriptada que se encuentra en la base de datos, y devuelve true si las contraseñas coinciden, o false si no coinciden.
+  }
+
+
+
+  
+
 
 export const User = mongoose.model('User', userSchema);
