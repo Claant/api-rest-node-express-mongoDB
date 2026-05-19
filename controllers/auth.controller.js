@@ -1,6 +1,6 @@
 import { User } from "../models/User.js"; // esto es una importacion nombrada, se importa el modelo de usuario que se exporto en el archivo User.js, y se le asigna el nombre de User, para poder usarlo en este archivo.
 import jwt from "jsonwebtoken"; // con este import se va a poder usar el metodo sign de jsonwebtoken, que es una funcion que se utiliza para generar un token JWT, y se le pasan los datos que se quieren incluir en el token, y una clave secreta para firmar el token.
-import { generateToken } from "../utils/tokenManager.js";
+import { generateRefreshToken, generateToken } from "../utils/tokenManager.js";
 
 
 //  Lo que se esta haciendo en esta ruta es recibir una peticion POST a la ruta /login.....,
@@ -31,6 +31,8 @@ export const register = async (req, res) => {
 
 
 
+
+
 export const login = async (req, res) => {
   try {
 const { email, password } = req.body; // aca se reciben los datos del cuerpo de la peticion (req.body), que son el email y la contraseña, y se asignan a las variables email y password respectivamente.    
@@ -41,6 +43,9 @@ const { email, password } = req.body; // aca se reciben los datos del cuerpo de 
 
 // Generar el token JWT
 const { token, expiresIn } = generateToken(user._id); // aca se llama a la funcion generateToken que se definio en el archivo utils/generateToken.js, y se le pasa el id del usuario que se obtuvo de la base de datos, y se le asigna a la variable token, esta variable va a ser un objeto que contiene el token generado y el tiempo de expiracion del token.
+generateRefreshToken(user.id, res); // aca se llama a la funcion generateRefreshToken que se definio en el archivo utils/generateToken.js, y se le pasa el id del usuario que se obtuvo de la base de datos, y la respuesta (res), esta funcion va a generar un token de refresco y lo va a enviar en una cookie al cliente, esta cookie se va a llamar refreshToken, y va a tener el token de refresco como valor, esta cookie se va a enviar con las opciones httpOnly y secure, para mayor seguridad, y el tiempo de expiracion del token de refresco es de 30 dias.
+
+
 
 return res.json({ token, expiresIn }); // se responde con un objeto JSON que contiene el token generado y el tiempo de expiracion del token.
   } catch (error) {
@@ -48,6 +53,8 @@ return res.json({ token, expiresIn }); // se responde con un objeto JSON que con
       return res.status(500).json({ error: "Error de servidor" });
   }
 };
+
+
 
 
 
@@ -61,3 +68,45 @@ export const infoUser = async (req, res) => {
   }
 
 }  
+
+
+
+
+
+
+
+export const refreshToken = (req, res) => {
+
+try{
+const refreshTokenCookie = req.cookies.refreshToken; // aca se obtiene el token de refresco de la cookie que se envio en la peticion, y se le asigna a la variable token, esta cookie se llama refreshToken, y se envio desde el login con la funcion generateRefreshToken que se definio en el archivo utils/generateToken.js, esta cookie se envio con las opciones httpOnly y secure, para mayor seguridad, y el tiempo de expiracion del token de refresco es de 30 dias.
+if(!refreshTokenCookie) throw new Error("No existe el token en la cookie"); // si token es undefined, es decir, si no se envio un token de refresco en la cookie de la peticion, se lanza un error indicando que no se proporciono un token de refresco en la cookie.
+
+const { uid } = jwt.verify(refreshTokenCookie, process.env.JWT_REFRESH); // aca se verifica el token de refresco con la clave secreta de los tokens de refresco, si el token es valido, no se produce ningun error y se obtiene el id del usuario del payload del token, y se le asigna a la variable uid, y luego se puede generar un nuevo token de acceso con ese id de usuario, y responder con ese nuevo token de acceso, y si el token de refresco no es valido, se lanza un error indicando que el token de refresco no es valido.
+const { token, expiresIn } = generateToken(uid); // aca se llama a la funcion generateToken que se definio en el archivo utils/generateToken.js, y se le pasa el id del usuario que se obtuvo del token de refresco, y se le asigna a la variable token, esta variable va a ser un objeto que contiene el token generado y el tiempo de expiracion del token.
+return res.json({ token, expiresIn }); // se responde con un objeto JSON que contiene el nuevo token generado y el tiempo de expiracion del token.
+
+}catch (error) {
+  console.log(error);
+  const TokenVerificationErrors = {
+      ["invalid signature"]: "La firma del token no es valida",
+      ["jwt expired"]: "El token ha expirado",
+      ["invalid token"]: "Token no valido",
+      ["No existe el token en el header  Bearer"]: "No se proporciono un token en el header de la peticion",
+      ["jwt malformed"]: "Token mal formado",
+    };
+    return res
+      .status(401)
+      .send({ error: TokenVerificationErrors[error.message] });
+ 
+}
+
+}
+
+
+
+
+export const logout = (req, res) => {
+  res.clearCookie("refreshToken");
+  res.json({ ok: true });
+};
+  

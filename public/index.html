@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <form id="form">
+        <input type="email" value="tono@alumno.com"  id="email">
+        <input type="password" value="123123" id="password">
+        <button type="submit">Acceder</button>
+
+<script>
+    const form = document.getElementById('form')
+    const password = document.getElementById('password')
+    const email = document.getElementById('email')
+
+
+form.addEventListener('submit', async(e) => {
+    e.preventDefault()
+    try {
+   
+      const res= await fetch('/api/v1/auth/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            email: email.value,
+            password: password.value
+        }),
+       });
+      
+       console.log(res.ok, res.status);
+       // aca se guarda el token en el localStorage del navegador, para poder usarlo en futuras peticiones a rutas protegidas, y asi no tener que volver a iniciar sesion cada vez que se quiera acceder a una ruta protegida, ya que el token se guarda en el localStorage y se puede usar en futuras peticiones, hasta que el token expire o se elimine del localStorage. 
+       const {token} = await res.json()
+       // localStorage.setItem('token', token) 
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ruta Protegida</title>
+  </head>
+  <body>
+    <h1>Ruta Protegida</h1>
+
+    <div>
+      <h2 id="app">Email:</h2>
+      <button id="logout">Cerrar Sesión</button>
+
+
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async (e) => {
+        // aca se le dice al navegador que ejecute este codigo cuando el DOM este completamente cargado.
+        try {
+          const resToken = await fetch("/api/v1/auth/refresh", {
+            method: "GET",
+            credentials: "include",
+          });
+
+          const { token } = await resToken.json(); // aca se obtiene el token de refresco que se envio en la cookie, y se le asigna a la variable token, esta variable va a ser un objeto que contiene el token de refresco generado y el tiempo de expiracion del token de refresco.
+
+          // Petición HTTP con fetch a la ruta protegida, enviando el token en el header de la peticion,
+          // para que el servidor pueda validar ese token y permitir o denegar el acceso a esa ruta protegida.
+          const res = await fetch("/api/v1/auth/protected", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+            //credentials: "include", // aca se le dice a fetch que envie las cookies en la peticion, para que el servidor pueda validar el token que se envia en las cookies, con el middleware validateToken que se definio en el archivo middlewares/validateToken.js, si el token es valido, se ejecuta el controlador infoUser que esta en controllers/auth.controller.js, y si el token no es valido, se responde con un error 401 indicando que no se tiene autorizacion para acceder a esa ruta.
+          });
+          // Manejo de la respuesta*****************************//
+          console.log(res.ok, res.status);
+          const data = await res.json();
+          //***********************************************************************************************//
+
+          if (res.ok) {
+            // aca se muestra el email del usuario que se obtuvo de la respuesta de la ruta protegida, si el token es valido, se obtiene el email del usuario y se muestra en el DOM, si el token no es valido, se obtiene un error 401 y no se muestra nada en el DOM.
+            document.getElementById("app").textContent = data.email;
+          }
+          console.log(data);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+
+   const logout = document.getElementById("logout");
+    logout.addEventListener("click", async (e) => {
+     const res= await fetch ("/api/v1/auth/logout", {
+        method: "GET",        
+      });
+      console.logo(res);
+    })
+
+    </script>
+  </body>
+</html>
