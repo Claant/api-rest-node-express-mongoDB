@@ -1,7 +1,5 @@
 import jwt from "jsonwebtoken"; // con este import se va a poder usar el metodo verify de jsonwebtoken, que es una funcion que se utiliza para verificar un token JWT, y se le pasan el token que se quiere verificar, y la clave secreta para verificar el token, esta clave debe ser la misma que se utilizo para firmar el token, y se debe guardar en una variable de entorno para evitar que se exponga en el codigo fuente.
 
-
-
 export const requireToken = (req, res, next) => {
   try {
     let token = req.headers?.authorization; // aca se obtiene el token del header de la peticion, y se le asigna a la variable token, el token se debe enviar en el header de la peticion con el nombre authorization, y el valor del token debe ser el token generado en el login.
@@ -26,7 +24,8 @@ export const requireToken = (req, res, next) => {
       ["invalid signature"]: "La firma del token no es valida",
       ["jwt expired"]: "El token ha expirado",
       ["invalid token"]: "Token no valido",
-      ["No existe el token en el header  Bearer"]: "No se proporciono un token en el header de la peticion",
+      ["No existe el token en el header  Bearer"]:
+        "No se proporciono un token en el header de la peticion",
       ["jwt malformed"]: "Token mal formado",
     };
     return res
