@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 
+
 export const generateToken = (uid) => {
   // este token validara cualquier peticion que se relice a la api.
   const expiresIn = 60 * 15; // tiempo de expiracion del token en segundos, en este caso se establece en 15 minutos (60 segundos * 15 minutos = 900 segundos).
@@ -34,3 +35,14 @@ export const generateRefreshToken = (uid, res) => {
     console.log(error);
   }
 };
+
+ // aca se define un objeto con los posibles errores que se pueden producir al verificar el token, y se le asigna a la variable TokenVerificationErrors, este objeto tiene como clave el mensaje de error que se produce al verificar el token, y como valor el mensaje de error que se va a enviar al cliente, esto se hace para evitar enviar mensajes de error confusos o poco claros al cliente, y para enviar mensajes de error mas amigables y comprensibles.
+    export const tokenVerificationErrors = {
+      ["invalid signature"]: "La firma del token no es valida",
+      ["jwt expired"]: "El token ha expirado",
+      ["invalid token"]: "Token no valido",
+      ["No existe el token en el header  Bearer"]: "No se proporciono un token en el header de la peticion",
+      ["No Bearer"]: "Utiliza el formato Bearer",
+      ["jwt malformed"]: "Token mal formado",
+      
+    };

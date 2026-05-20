@@ -1,10 +1,6 @@
 import { validationResult } from "express-validator";
 
 
-// en validationResult.js se van a manejar los errores de validacion que se puedan generar en las rutas, utilizando el metodo validationResult de express-validator, que es una funcion que se utiliza para validar los datos que se reciben en el cuerpo de la peticion (req.body)....,
-
-
-
 // esta funcion se va a utilizar como un middleware en las rutas, para validar los datos que se reciben en el cuerpo de la peticion (req.body)....,
 // ...y si hay errores de validacion, se responde con un status 400 y un objeto JSON que tiene una propiedad errors con un array de los errores encontrados.
 
@@ -19,5 +15,3 @@ next();
 }
 
 
-// nota es crear una logica que se implementa en las rutas, para validar los datos que se reciben en el cuerpo de la peticion (req.body)....,
-// ...y si hay errores de validacion, se responde con un status 400 y un objeto JSON que tiene una propiedad errors con un array de los errores encontrados.

@@ -5,56 +5,18 @@ import { validationResultExpress } from "../middlewares/validationResultExpress.
 // ...y se puede usar para validar que el email tenga un formato correcto, que la contraseña tenga una longitud minima, etc.
 import { body } from "express-validator";
 import { requireToken } from "../middlewares/requireToken.js";
+import { requireRefreshToken } from "../middlewares/requirerefreshToken.js";
+import { bodyLoginValidator, bodyRegisterValidator } from "../middlewares/validatorManager.js";
+
+
 
 const router = express.Router();
 
 
-// aca solo se esta importando desde el auth.controller.js la funcion login y register....,
-// ....que son las que se van a ejecutar cuando se reciba una peticion a la ruta /login o /register respectivamente.
-
-router.post(
-  "/register",
-  [
-    // las validaciones en el backend son obligatorias, para evitar que se reciban datos incorrectos o maliciosos, y para garantizar la integridad de los datos en la base de datos.
-    // .ismail() esta funcion se utiliza para validar que el email tenga un formato correcto.
-    // .normalizeEmail() esta funcion se utiliza para normalizar el email, es decir, convertirlo a minusculas, eliminar los puntos, etc. para evitar que haya emails duplicados por diferencias en el formato.
-    // .trim() esta funcion se utiliza para eliminar los espacios en blanco al inicio y al final del string, para evitar que haya problemas con los espacios en blanco.
-    body("email", "Formato de email no valido")
-      .trim()
-      .isEmail()
-      .normalizeEmail(),
-   
-    body("password", "Minimo 6 caracteres").trim().isLength({ min: 6 }), // .isLength({ min: 6 }) esta funcion se utiliza para validar que la contraseña tenga una longitud minima de 6 caracteres.
-
-    // custom se usa para crear una validacion personalizada.
-    // aca validamos que el campo password y repassword sean iguales, para evitar que el usuario se equivoque al escribir la contraseña y luego no pueda iniciar sesion porque no recuerda como la escribio.
-    body("password", "formato de password no valido").custom(
-      (value, { req }) => {
-        if (value !== req.body.repassword) {
-          throw new Error("Las contraseñas no coinciden");
-        }
-        return value;
-      },
-    ),
-  ],
-  // aca se llama a la funcion validationResultExpress, que es un middleware que se encarga de validar los datos que se reciben en el cuerpo de la peticion (req.body)....,
-  // ...y si hay errores de validacion, se responde con un status 400 y un objeto JSON que tiene una propiedad errors con un array de los errores encontrados.
-  validationResultExpress,
-  register,  // controlador que esta en controlles/auth.controller.js, que se va a ejecutar si no hay errores de validacion.
-);
-
-router.post("/login",
-    body("email", "Formato de email no valido")
-      .trim()
-      .isEmail()
-      .normalizeEmail(),   
-    body("password", "Minimo 6 caracteres").trim().isLength({ min: 6 }),
-    validationResultExpress,
-    login // controlador que esta en controlles/auth.controller.js, que se va a ejecutar si no hay errores de validacion.
-);
-
+router.post( "/register", bodyRegisterValidator, register,);
+router.post("/login", bodyLoginValidator, login ); 
 router.get('/protected', requireToken, infoUser) // esta ruta es un ejemplo de una ruta protegida, que solo se puede acceder si se envia un token valido en el header de la peticion, y se valida ese token con el middleware validateToken que se definio en el archivo middlewares/validateToken.js, si el token es valido, se ejecuta el controlador infoUser que esta en controllers/auth.controller.js, y si el token no es valido, se responde con un error 401 indicando que no se tiene autorizacion para acceder a esa ruta.
-router.get("/refresh", refreshToken);
+router.get("/refresh", requireRefreshToken, refreshToken);
 router.get("/logout", logout);
 
 export default router;
